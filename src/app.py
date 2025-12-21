@@ -2,6 +2,7 @@ import streamlit as st
 from utils import fetch_analysis_column, generate_pdf
 import time
 from utils import get_base64_bin_file
+from utils import get_base64_image
 
 # --- 1. PAGE CONFIG & DESIGN ---
 st.set_page_config(
@@ -13,54 +14,45 @@ st.set_page_config(
 
 # Custom CSS for Purple Gradient and Design
 try:
-    bin_str = get_base64_bin_file('assets/background.jpg')
-    bg_img_style = f"""
+    img_base64 = get_base64_image("assets/background.jpg")
+    bg_style = f"""
+        <style>
         [data-testid="stAppViewContainer"] {{
-            background-image: url("data:image/png;base64,{bin_str}");
+            background-image: url("data:image/png;base64,{img_base64}");
             background-size: cover;
             background-position: center;
             background-attachment: fixed;
         }}
     """
 except FileNotFoundError:
-    # Fallback to the purple gradient if image isn't found
-    bg_img_style = """
-        [data-testid="stAppViewContainer"] {
-            background: linear-gradient(135deg, #1e0030 0%, #4b0082 50%, #1e0030 100%);
-        }
-    """
+    bg_style = "<style> .stApp { background: #1e0030; } " # Fallback
 
-st.markdown(f"""
-    <style>
-    {bg_img_style}
-    
-    /* FIX THE EMPTY BAR: Make header transparent and zero height */
-    [data-testid="stHeader"] {{
+st.markdown(bg_style + """
+    /* HIDE THE EMPTY TOP BAR */
+    header[data-testid="stHeader"] {
         background: rgba(0,0,0,0);
         height: 0px;
-    }}
-    
-    /* REMOVE PADDING: Bring content to the very top */
-    .block-container {{
-        padding-top: 2rem;
-        padding-bottom: 0rem;
-    }}
+    }
 
-    /* Your existing button and glassmorphism styles */
-    .stApp {{ color: white; }}
-    div[data-testid="stHorizontalBlock"] button {{
-        background-color: rgba(255, 255, 255, 0.1) !important;
-        border: 1px solid #9d5bef !important;
-        color: white !important;
-        border-radius: 10px;
-    }}
-    .glass-box {{
+    /* REMOVE PADDING BELOW HEADING */
+    .block-container {
+        padding-top: 1rem !important;
+        padding-bottom: 0rem !important;
+    }
+    
+    /* REMOVE SPACE BETWEEN ELEMENTS */
+    [data-testid="stVerticalBlock"] {
+        gap: 0.5rem !important;
+    }
+
+    .stApp { color: white; }
+    .glass-box {
         background: rgba(255, 255, 255, 0.05);
-        backdrop-filter: blur(10px);
+        backdrop-filter: blur(15px);
         border-radius: 15px;
-        padding: 25px;
+        padding: 20px;
         border: 1px solid rgba(255, 255, 255, 0.1);
-    }}
+    }
     </style>
 """, unsafe_allow_html=True)
 
