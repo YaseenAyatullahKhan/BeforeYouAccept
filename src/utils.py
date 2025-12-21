@@ -2,6 +2,12 @@ import streamlit as st
 from jamaibase import JamAI, types as t
 from fpdf import FPDF
 import time
+import base64
+
+def get_base64_bin_file(bin_file):
+    with open(bin_file, 'rb') as f:
+        data = f.read()
+    return base64.b64encode(data).decode()
 
 # Initialize JamAI Client
 def get_jamai_client():
