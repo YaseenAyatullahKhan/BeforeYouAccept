@@ -9,9 +9,9 @@ BeforeYouAccept/
 ├── assets/
 │   ├── logo.png         # The logo
 │   └── background.jpg   # The hero page image
-├── src/
-│   ├── app.py               # MAIN CODE (The heart of the project)
-│   ├── utils.py             # Helper functions (API calls & PDF logic)
-│   ├── requirements.txt     # List: streamlit, jamai-base, fpdf
-│   └── .env
+└── src/
+    ├── app.py               # MAIN CODE (The heart of the project)
+    ├── utils.py             # Helper functions (API calls & PDF logic)
+    ├── requirements.txt     # List: streamlit, jamai-base, fpdf
+    └── .env
 ```
