@@ -69,7 +69,7 @@ if st.session_state.page == "landing":
         st.markdown("<h1 class='hero-text'>Know Those T&Cs Right 🧐</h1>", unsafe_allow_html=True)
         
         # Space for your background hero image placeholder
-        # st.image("assets/background.jpg", use_container_width=True)
+        st.image("assets/background.jpg", use_container_width=True)
         
         if st.button("Get T&C Alerts", use_container_width=True, type="primary"):
             st.session_state.page = "execution"
