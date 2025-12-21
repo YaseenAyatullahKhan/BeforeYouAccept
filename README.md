@@ -5,13 +5,14 @@ An AI-powered Terms and Conditions document checker ✨. Uses the Malaysian ETT,
 ```
 BeforeYouAccept/
 ├── .streamlit/
-│   └── config.toml      # Theme settings (primary purple color)
+│   └── config.toml         # Theme settings (primary purple color)
+├── src/
+│   ├── app.py              # MAIN CODE (The heart of the project)
+│   ├── utils.py            # Helper functions (API calls & PDF logic)
+│   └── requirements.txt    # List: streamlit, jamai-base, fpdf
 ├── assets/
-│   ├── logo.png         # The logo
-│   └── background.jpg   # The hero page image
-└── src/
-    ├── app.py               # MAIN CODE (The heart of the project)
-    ├── utils.py             # Helper functions (API calls & PDF logic)
-    ├── requirements.txt     # List: streamlit, jamai-base, fpdf
-    └── .env
+│   ├── logo.png
+│   └── background.jpg      #hero page image
+├── .gitignore
+└── README.md
 ```
