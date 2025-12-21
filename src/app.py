@@ -1,50 +1,66 @@
 import streamlit as st
 from utils import fetch_analysis_column, generate_pdf
 import time
+from utils import get_base64_bin_file
 
 # --- 1. PAGE CONFIG & DESIGN ---
 st.set_page_config(
     page_title="BeforeYouAccept",
-    page_icon="🧐",
+    page_icon="📜",
     layout="centered",
     initial_sidebar_state="collapsed"
 )
 
 # Custom CSS for Purple Gradient and Design
-st.markdown("""
+try:
+    bin_str = get_base64_bin_file('assets/background.jpg')
+    bg_img_style = f"""
+        [data-testid="stAppViewContainer"] {{
+            background-image: url("data:image/png;base64,{bin_str}");
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+        }}
+    """
+except FileNotFoundError:
+    # Fallback to the purple gradient if image isn't found
+    bg_img_style = """
+        [data-testid="stAppViewContainer"] {
+            background: linear-gradient(135deg, #1e0030 0%, #4b0082 50%, #1e0030 100%);
+        }
+    """
+
+st.markdown(f"""
     <style>
-    /* Gradient Background */
-    .stApp {
-        background: linear-gradient(135deg, #1e0030 0%, #4b0082 50%, #1e0030 100%);
-        color: white;
-    }
+    {bg_img_style}
     
-    /* Center Branding on Landing */
-    .hero-text {
-        text-align: center;
-        padding: 50px 0;
-    }
+    /* FIX THE EMPTY BAR: Make header transparent and zero height */
+    [data-testid="stHeader"] {{
+        background: rgba(0,0,0,0);
+        height: 0px;
+    }}
     
-    /* Tab Styling Override */
-    div[data-testid="stHorizontalBlock"] button {
+    /* REMOVE PADDING: Bring content to the very top */
+    .block-container {{
+        padding-top: 2rem;
+        padding-bottom: 0rem;
+    }}
+
+    /* Your existing button and glassmorphism styles */
+    .stApp {{ color: white; }}
+    div[data-testid="stHorizontalBlock"] button {{
         background-color: rgba(255, 255, 255, 0.1) !important;
         border: 1px solid #9d5bef !important;
         color: white !important;
         border-radius: 10px;
-    }
-    
-    div[data-testid="stHorizontalBlock"] button:hover {
-        background-color: #9d5bef !important;
-    }
-
-    /* Glassmorphism Containers */
-    .glass-box {
+    }}
+    .glass-box {{
         background: rgba(255, 255, 255, 0.05);
+        backdrop-filter: blur(10px);
         border-radius: 15px;
-        padding: 20px;
+        padding: 25px;
         border: 1px solid rgba(255, 255, 255, 0.1);
-        margin-bottom: 20px;
-    }
+    }}
     </style>
 """, unsafe_allow_html=True)
 
