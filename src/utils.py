@@ -4,6 +4,10 @@ from fpdf import FPDF
 import time
 import base64
 
+def get_base64_image(file_path):
+    with open(file_path, "rb") as image_file:
+        return base64.b64encode(image_file.read()).decode()
+
 def get_base64_bin_file(bin_file):
     with open(bin_file, 'rb') as f:
         data = f.read()
