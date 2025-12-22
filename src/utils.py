@@ -30,7 +30,7 @@ def fetch_analysis_column(tnc_text, column_name):
         # Add a row to the 'Analyzer' Action Table
         response = jamai.table.add_table_rows(
             table_type=t.TableType.ACTION,
-            request=t.RowAddRequest(
+            request=t.MultiRowAddRequest(
                 table_id="Analyzer",
                 data=[{"tnc_text": tnc_text}],
                 stream=False
