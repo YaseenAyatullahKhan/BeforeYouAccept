@@ -48,6 +48,8 @@ st.markdown(bg_style + """
     .stApp { color: white; }
     
     .glass-box {
+        height: 1500
+        width: 90%
         background: rgba(255, 255, 255, 0.05);
         backdrop-filter: blur(15px);
         border-radius: 15px;
@@ -71,6 +73,8 @@ st.markdown(bg_style + """
     }
 
     .info-section, .glass-box {
+        height: 1500
+        width: 90%
         background: rgba(255, 255, 255, 0.05);
         padding: 3rem; /* Increased padding for a more spacious feel */
         border-radius: 20px;
