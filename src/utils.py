@@ -91,10 +91,12 @@ def generate_pdf(results_dict):
         content = results_dict.get(key, "No analysis performed for this section.")
         
         # Clean up emojis for PDF compatibility (PDF fonts often don't support ⚠️)
-        clean_content = content.replace("⚠️", "!!") 
-        
+        try:
+            clean_content = content.replace("⚠️", "!!") 
+        except:
+            print("Couldn't replace bullet points with ⚠️")
+            
         pdf.multi_cell(0, 10, clean_content)
         pdf.ln(10)
         
-    return bytes(pdf.output())
     return bytes(pdf.output())
