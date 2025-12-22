@@ -109,8 +109,9 @@ if st.session_state.page == "landing":
         st.write("""
             BYA is an AI-powered legal audit tool designed to protect consumers in Malaysia. 
             By leveraging the **Malaysian Consumer Protection Act 1999** and the **Personal Data Protection Act 2010**, 
-            we scan complex Terms & Conditions to find hidden risks so you don't have to.<br>
-            <br>Made by Yaseen Ayatullah Khan | 2025
+            we scan complex Terms & Conditions to find hidden risks so you don't have to.
+            <br><br>
+            Made by [Full Name] | 2025
         """)
         st.markdown("</div>", unsafe_allow_html=True)
     
