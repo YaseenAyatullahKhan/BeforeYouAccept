@@ -1,5 +1,5 @@
 import streamlit as st
-from utils import fetch_full_analysis, generate_pdf, get_base64_image
+from utils import fetch_full_analysis, generate_pdf, get_base64_bin_file
 import time
 
 # --- 1. PAGE CONFIG & DESIGN ---
@@ -12,7 +12,7 @@ st.set_page_config(
 
 # Custom CSS for Background and Removing the "Empty Bar"
 try:
-    img_base64 = get_base64_image("assets/background.jpg")
+    img_base64 = get_base64_bin_file("assets/background.jpg")
     bg_style = f"""
         <style>
         [data-testid="stAppViewContainer"] {{
