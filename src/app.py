@@ -124,7 +124,12 @@ else:
 
     # --- RESULTS SECTION ---
     if st.session_state.risk_header:
-        st.markdown(f"<h2 style='text-align: center; color: #9d5bef;'>{st.session_state.risk_header}</h2>", unsafe_allow_html=True)
+        # Clean the header if it contains the JamAI internal error message
+        display_header = st.session_state.risk_header
+        if "KeyError" in display_header or "Output column" in display_header:
+            display_header = "⚠️ Analysis Column Mismatch - Check JamAI Column IDs"
+    
+        st.markdown(f"<h2 style='text-align: center; color: #9d5bef;'>{display_header}</h2>", unsafe_allow_html=True)
         
         # Fake Tabs using columns
         t1, t2, t3 = st.columns(3)
