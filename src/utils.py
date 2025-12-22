@@ -95,4 +95,4 @@ def generate_pdf(results_dict):
         pdf.multi_cell(0, 8, clean_content)
         pdf.ln(10)
         
-    return pdf.output()
+    return bytes(pdf.output())
