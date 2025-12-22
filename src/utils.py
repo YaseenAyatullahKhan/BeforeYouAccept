@@ -3,6 +3,7 @@ from jamaibase import JamAI, types as t
 from fpdf import FPDF
 import time
 import base64
+import re
 
 # Helper for images
 def get_base64_bin_file(bin_file):
