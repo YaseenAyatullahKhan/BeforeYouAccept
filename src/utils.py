@@ -4,10 +4,7 @@ from fpdf import FPDF
 import time
 import base64
 
-def get_base64_image(file_path):
-    with open(file_path, "rb") as image_file:
-        return base64.b64encode(image_file.read()).decode()
-
+# Helper for images
 def get_base64_bin_file(bin_file):
     with open(bin_file, 'rb') as f:
         data = f.read()
@@ -15,12 +12,15 @@ def get_base64_bin_file(bin_file):
 
 # Initialize JamAI Client
 def get_jamai_client():
-    # Streamlit Cloud will fetch this from "Secrets" (Advanced Settings)
     api_key = st.secrets["JAMAI_API_KEY"]
     project_id = st.secrets["JAMAI_PROJECT_ID"]
     return JamAI(token=api_key, project_id=project_id)
 
-def fetch_analysis_column(tnc_text, column_name):
+def fetch_full_analysis(tnc_text):
+    """
+    Fetches all analysis columns in a single JamAI row addition.
+    Saves tokens by only adding one row per T&C document.
+    """
     jamai = get_jamai_client()
     try:
         response = jamai.table.add_table_rows(
@@ -33,70 +33,50 @@ def fetch_analysis_column(tnc_text, column_name):
         )
         
         if response.rows:
-            # JamAI returns a dictionary: { "column_name": ColumnObject }
-            row_data = response.rows[0].columns
-            
-            if column_name in row_data:
-                # Use .text to get the actual LLM output string
-                result = row_data[column_name].text
-                
-                # Special formatting for Critical Alerts
-                if column_name == "critical_alerts":
-                    result = result.replace("- ", "⚠️ ").replace("* ", "⚠️ ")
-                return result
-            else:
-                return f"Error: Column '{column_name}' not found in JamAI table."
+            # Return the raw dictionary of column names to text values
+            cols = response.rows[0].columns
+            return {k: v.text for k, v in cols.items()}
                 
     except Exception as e:
-        return f"Error connecting to JamAI: {str(e)}"
-    return "Error: Could not retrieve analysis."
+        st.error(f"JamAI Error: {str(e)}")
+    return None
 
 def generate_pdf(results_dict):
     """
-    Generates a professional Deep Purple themed PDF report.
+    Generates a PDF with Unicode-safe text processing.
     """
     pdf = FPDF()
     pdf.add_page()
     
-    # Title
-    pdf.set_font("Arial", 'B', 24)
-    pdf.set_text_color(75, 0, 130) # Deep Purple (Indigo)
+    # 1. Title
+    pdf.set_font("Helvetica", 'B', 24)
+    pdf.set_text_color(75, 0, 130)
     pdf.cell(200, 20, "BeforeYouAccept: Risk Report", ln=True, align='C')
     pdf.ln(10)
     
-    # Date
-    pdf.set_font("Arial", size=10)
-    pdf.set_text_color(100, 100, 100)
-    pdf.cell(200, 10, f"Generated on: {time.strftime('%Y-%m-%d %H:%M:%S')}", ln=True, align='R')
-    pdf.ln(10)
-    
-    # Content Sections
     sections = {
+        "Risk Score": "risk_scoring",
         "Summary": "analysis_summary",
         "Critical Alerts": "critical_alerts",
         "Long Term Implications": "long_term_implications"
     }
     
     for title, key in sections.items():
-        # Header
-        pdf.set_font("Arial", 'B', 16)
-        pdf.set_text_color(106, 13, 173) # Purple
+        pdf.set_font("Helvetica", 'B', 16)
+        pdf.set_text_color(106, 13, 173)
         pdf.cell(200, 10, title, ln=True)
-        pdf.line(10, pdf.get_y(), 200, pdf.get_y()) # Purple underline
+        pdf.line(10, pdf.get_y(), 200, pdf.get_y())
         pdf.ln(5)
         
-        # Body
-        pdf.set_font("Arial", size=12)
+        pdf.set_font("Helvetica", size=12)
         pdf.set_text_color(0, 0, 0)
-        content = results_dict.get(key, "No analysis performed for this section.")
         
-        # Clean up emojis for PDF compatibility (PDF fonts often don't support ⚠️)
-        try:
-            clean_content = content.replace("⚠️", "!!") 
-        except:
-            print("Couldn't replace bullet points with ⚠️")
-            
+        # FIX: Sanitize content for PDF (Removes emojis and smart quotes)
+        content = results_dict.get(key, "No data.")
+        clean_content = content.replace("’", "'").replace("“", '"').replace("”", '"')
+        clean_content = clean_content.replace("⚠️", "!!").replace("🔴", "!!").replace("🟡", "!!").replace("🟢", "OK")
+        
         pdf.multi_cell(0, 10, clean_content)
         pdf.ln(10)
         
-    return bytes(pdf.output())
+    return pdf.output()
