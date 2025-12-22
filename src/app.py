@@ -26,6 +26,7 @@ except FileNotFoundError:
     bg_style = "<style> .stApp { background: #1e0030; } "
 
 st.markdown(bg_style + """
+    <style>
     /* HIDE STREAMLIT HEADER & REDUCE TOP GAP */
     header[data-testid="stHeader"] {
         background: rgba(0,0,0,0);
@@ -55,7 +56,7 @@ st.markdown(bg_style + """
         margin-top: 10px;
     }
 
-    /* Style for the 'fake' tabs */
+    /* Style for the tabs */
     div[data-testid="stHorizontalBlock"] button {
         background-color: rgba(255, 255, 255, 0.1) !important;
         color: white !important;
@@ -71,7 +72,7 @@ st.markdown(bg_style + """
     }
     .disclaimer-text {
         font-size: 0.85rem;
-        color: #b0b0b0;
+        color: #000000;
         line-height: 1.4;
     }
     </style>
@@ -96,7 +97,7 @@ if st.session_state.page == "landing":
         except:
             st.title("🧐 BeforeYouAccept")
         
-        st.markdown("<h2 style='text-align: center;'>Know Those T&Cs Right 🧐</h2>", unsafe_allow_html=True)
+        st.markdown("<h1 style='text-align: center;'>Know Those T&Cs Right 🧐</h1>", unsafe_allow_html=True)
         
         if st.button("Get T&C Alerts", use_container_width=True, type="primary"):
             st.session_state.page = "execution"
@@ -104,32 +105,35 @@ if st.session_state.page == "landing":
         st.markdown("---") # Visual separator
     
         # --- ABOUT SECTION ---
-        st.markdown("<div class='info-section'>", unsafe_allow_html=True)
-        st.subheader("🛡️ About Before You Accept")
-        st.write("""
-            BYA is an AI-powered legal audit tool designed to protect consumers in Malaysia. 
-            By leveraging the **Malaysian Consumer Protection Act 1999** and the **Personal Data Protection Act 2010**, 
-            we scan complex Terms & Conditions to find hidden risks so you don't have to.
-            <br><br>
-            Made by [Full Name] | 2025
-        """)
-        st.markdown("</div>", unsafe_allow_html=True)
+        st.markdown("""
+        <div class='info-section'>
+            <h2>🛡️ About Before You Accept</h2>
+            <p>
+                BYA is an AI-powered legal audit tool designed to protect consumers in Malaysia. 
+                By leveraging the <b>Malaysian Consumer Protection Act 1999</b> and the 
+                <b>Personal Data Protection Act 2010</b>, we scan complex Terms & Conditions 
+                to find hidden risks so you don't have to.
+                <br><br>
+                Made by [Full Name] | 2025
+            </p>
+        </div>
+        """, unsafe_allow_html=True)
     
         # --- DISCLAIMER SECTION ---
-        st.markdown("<div class='info-section'>", unsafe_allow_html=True)
-        st.subheader("⚖️ Legal Disclaimer")
         st.markdown("""
+        <div class='info-section'>
+            <h2>⚖️ Legal Disclaimer</h2>
             <div class='disclaimer-text'>
                 This tool is powered by Artificial Intelligence and is for <b>informational purposes only</b>. 
-                It does not constitute professional legal advice. While we strive for accuracy based on 
-                Malaysian Law, the AI may occasionally misinterpret clauses. 
+                It does not constitute professional legal advice. While we strive for accuracy based 
+                on Malaysian Law, the AI may occasionally misinterpret clauses. 
                 <br><br>
                 Always consult with a qualified legal professional for serious contractual matters. 
                 By using this tool, you acknowledge that "Before You Accept" is not liable for any 
                 decisions made based on this analysis.
             </div>
+        </div>
         """, unsafe_allow_html=True)
-        st.markdown("</div>", unsafe_allow_html=True)
 
 # --- 4. PAGE LOGIC: EXECUTION PAGE ---
 else:
