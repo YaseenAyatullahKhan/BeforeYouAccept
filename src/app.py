@@ -40,7 +40,7 @@ st.markdown(bg_style + """
 
     /* REMOVE THE GAP BELOW THE TITLE */
     h1 {
-        margin-top: -50px !important;
+        margin-top: 50px !important;
         margin-bottom: 0px !important;
         padding-bottom: 0px !important;
     }
