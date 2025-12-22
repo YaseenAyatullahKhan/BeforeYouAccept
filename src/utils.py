@@ -98,4 +98,4 @@ def generate_pdf(results_dict):
         pdf.multi_cell(0, 10, clean_content)
         pdf.ln(10)
         
-    return pdf.output(dest='S').encode('latin-1')
+    return bytes(pdf.output())
