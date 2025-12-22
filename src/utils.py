@@ -44,17 +44,19 @@ def fetch_full_analysis(tnc_text):
 
 def generate_pdf(results_dict):
     """
-    Generates a PDF with Unicode-safe text processing.
+    Generates a report by cleaning all non-standard characters 
+    to prevent FPDFUnicodeEncodingException.
     """
     pdf = FPDF()
     pdf.add_page()
     
-    # 1. Title
+    # Header
     pdf.set_font("Helvetica", 'B', 24)
-    pdf.set_text_color(75, 0, 130)
+    pdf.set_text_color(75, 0, 130) # Deep Purple
     pdf.cell(200, 20, "BeforeYouAccept: Risk Report", ln=True, align='C')
     pdf.ln(10)
     
+    # Define what sections to include in the PDF
     sections = {
         "Risk Score": "risk_scoring",
         "Summary": "analysis_summary",
@@ -63,21 +65,34 @@ def generate_pdf(results_dict):
     }
     
     for title, key in sections.items():
+        # Section Header
         pdf.set_font("Helvetica", 'B', 16)
-        pdf.set_text_color(106, 13, 173)
+        pdf.set_text_color(106, 13, 173) # Purple
         pdf.cell(200, 10, title, ln=True)
         pdf.line(10, pdf.get_y(), 200, pdf.get_y())
         pdf.ln(5)
         
-        pdf.set_font("Helvetica", size=12)
+        # Section Body
+        pdf.set_font("Helvetica", size=11)
         pdf.set_text_color(0, 0, 0)
         
-        # FIX: Sanitize content for PDF (Removes emojis and smart quotes)
-        content = results_dict.get(key, "No data.")
-        clean_content = content.replace("’", "'").replace("“", '"').replace("”", '"')
-        clean_content = clean_content.replace("⚠️", "!!").replace("🔴", "!!").replace("🟡", "!!").replace("🟢", "OK")
+        # 1. Get content and convert to string
+        content = str(results_dict.get(key, "Information not available for this section."))
         
-        pdf.multi_cell(0, 10, clean_content)
+        # 2. THE FIX: Replace characters that FPDF hates
+        replacements = {
+            "—": "-", "–": "-", "“": '"', "”": '"', "‘": "'", "’": "'",
+            "©": "(c)", "®": "(r)", "™": "TM", "⚠️": "!!", "🔴": "X", 
+            "🟡": "!", "🟢": "OK", "🚀": ">", "•": "*"
+        }
+        for char, replacement in replacements.items():
+            content = content.replace(char, replacement)
+        
+        # 3. FINAL FAILSAFE: Strip any remaining non-Latin-1 characters
+        # This prevents the app from crashing even if there's a weird hidden character
+        clean_content = content.encode('latin-1', 'ignore').decode('latin-1')
+        
+        pdf.multi_cell(0, 8, clean_content)
         pdf.ln(10)
         
     return pdf.output()
