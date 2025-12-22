@@ -17,7 +17,7 @@ def get_base64_bin_file(bin_file):
 def get_jamai_client():
     # Streamlit Cloud will fetch this from "Secrets" (Advanced Settings)
     api_key = st.secrets["JAMAI_API_KEY"]
-    project_id = st.secrets.get("JAMAI_PROJECT_ID", "proj_aab63d006950e027eebfe137")
+    project_id = st.secrets["JAMAI_PROJECT_ID"]
     return JamAI(token=api_key, project_id=project_id)
 
 def fetch_analysis_column(tnc_text, column_name):
