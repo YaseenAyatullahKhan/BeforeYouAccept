@@ -63,20 +63,31 @@ st.markdown(bg_style + """
         border: 1px solid rgba(157, 91, 239, 0.5) !important;
     }
 
-    .info-section {
+    /* Remove standard Streamlit padding at the top */
+    .block-container {
+        padding-top: 2rem;
+        padding-bottom: 2rem;
+        max-width: 90%; /* Allows the content to expand significantly */
+    }
+
+    .info-section, .glass-box {
         background: rgba(255, 255, 255, 0.05);
-        padding: 2rem;
-        border-radius: 15px;
+        padding: 3rem; /* Increased padding for a more spacious feel */
+        border-radius: 20px;
         border: 1px solid rgba(255, 255, 255, 0.1);
         margin-top: 2rem;
+        width: 100%; /* Ensure it fills the wide container */
+        color: #ffffff; /* Fixes your black text issue */
     }
+
+    /* Keep the disclaimer text readable but distinct */
     .disclaimer-text {
-        font-size: 0.85rem;
-        color: #000000;
-        line-height: 1.4;
+        font-size: 0.95rem;
+        color: #e0e0e0;
+        line-height: 1.6;
     }
     </style>
-""", unsafe_allow_html=True)
+    """, unsafe_allow_html=True)
 
 # --- 2. SESSION STATE INITIALIZATION ---
 if "page" not in st.session_state:
