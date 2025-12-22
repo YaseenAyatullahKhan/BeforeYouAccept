@@ -40,7 +40,7 @@ st.markdown(bg_style + """
 
     /* REMOVE THE GAP BELOW THE TITLE */
     h1 {
-        margin-top: 50px !important;
+        margin-top: 20px !important;
         margin-bottom: 0px !important;
         padding-bottom: 0px !important;
     }
@@ -48,7 +48,7 @@ st.markdown(bg_style + """
     .stApp { color: white; }
     
     .glass-box {
-        height: 1500
+        height: 2000
         width: 100%
         background: rgba(255, 255, 255, 0.05);
         backdrop-filter: blur(15px);
@@ -73,8 +73,8 @@ st.markdown(bg_style + """
     }
 
     .info-section, .glass-box {
-        height: 1500
-        width: 90%
+        height: 2000
+        width: 100%
         background: rgba(255, 255, 255, 0.05);
         padding: 3rem; /* Increased padding for a more spacious feel */
         border-radius: 20px;
