@@ -40,7 +40,7 @@ st.markdown(bg_style + """
 
     /* REMOVE THE GAP BELOW THE TITLE */
     h1 {
-        margin-top: -20px !important;
+        margin-top: -10px !important;
         margin-bottom: 0px !important;
         padding-bottom: 0px !important;
     }
@@ -49,7 +49,7 @@ st.markdown(bg_style + """
     
     .glass-box {
         height: 1500
-        width: 90%
+        width: 100%
         background: rgba(255, 255, 255, 0.05);
         backdrop-filter: blur(15px);
         border-radius: 15px;
@@ -122,14 +122,14 @@ if st.session_state.page == "landing":
         # --- ABOUT SECTION ---
         st.markdown("""
         <div class='info-section'>
-            <h2>🛡️ About Before You Accept</h2>
+            <h2>🛡️ About BYA</h2>
             <p>
-                BYA is an AI-powered legal audit tool designed to protect consumers in Malaysia. 
+                BeforeYouAccept is an AI-powered legal audit tool designed to protect consumers in Malaysia. 
                 By leveraging the <b>Malaysian Consumer Protection Act 1999</b> and the 
                 <b>Personal Data Protection Act 2010</b>, we scan complex Terms & Conditions 
                 to find hidden risks so you don't have to.
                 <br><br>
-                Made by [Full Name] | 2025
+                Made by Yaseen Ayatullah Khan | 2025
             </p>
         </div>
         """, unsafe_allow_html=True)
@@ -156,7 +156,7 @@ else:
     
     # --- INPUT SECTION ---
     with st.container():
-        st.markdown("<div class='glass-box'>", unsafe_allow_html=True)
+        st.markdown("<div>", unsafe_allow_html=True)
         input_type = st.radio("Choose Input Method:", ["Paste Text", "Upload PDF"], horizontal=True)
         
         tnc_input = ""
