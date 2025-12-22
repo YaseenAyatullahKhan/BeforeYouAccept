@@ -21,34 +21,32 @@ def get_jamai_client():
     return JamAI(token=api_key, project_id=project_id)
 
 def fetch_analysis_column(tnc_text, column_name):
-    """
-    Calls JamAI for a specific column only. 
-    This is the core 'Token Saver' logic.
-    """
     jamai = get_jamai_client()
     try:
-        # Add a row to the 'Analyzer' Action Table
         response = jamai.table.add_table_rows(
             table_type=t.TableType.ACTION,
-            request=t.MultiRowAddRequest(
-                table_id="Analyzer",
+            request=t.RowAddRequest(
+                table_id="Analyzer", 
                 data=[{"tnc_text": tnc_text}],
                 stream=False
             )
         )
         
-        # Extract the specific column requested
         if response.rows:
-            # Note: JamAI returns all columns in the row. 
-            # Filter for the one the user clicked.
+            # JamAI returns a dictionary: { "column_name": ColumnObject }
             row_data = response.rows[0].columns
-            result = next((col.value for col in row_data if col.name == column_name), "No data found.")
             
-            # Special formatting for Critical Alerts
-            if column_name == "critical_alerts":
-                result = result.replace("- ", "⚠️ ").replace("* ", "⚠️ ")
+            if column_name in row_data:
+                # Use .text to get the actual LLM output string
+                result = row_data[column_name].text
                 
-            return result
+                # Special formatting for Critical Alerts
+                if column_name == "critical_alerts":
+                    result = result.replace("- ", "⚠️ ").replace("* ", "⚠️ ")
+                return result
+            else:
+                return f"Error: Column '{column_name}' not found in JamAI table."
+                
     except Exception as e:
         return f"Error connecting to JamAI: {str(e)}"
     return "Error: Could not retrieve analysis."
