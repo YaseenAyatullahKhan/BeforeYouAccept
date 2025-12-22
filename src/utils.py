@@ -21,21 +21,17 @@ def get_jamai_client():
     return JamAI(token=api_key, project_id=project_id)
 
 def fetch_analysis_column(tnc_text, column_name):
+    """
+    Calls JamAI for a specific column only. 
+    This is the core 'Token Saver' logic.
+    """
     jamai = get_jamai_client()
     try:
-        # 1. Debug: List what tables the API actually sees
-        available = jamai.table.list_tables(t.TableType.ACTION)
-        table_ids = [tab.id for tab in available.items]
-        
-        target_id = "Analyzer"
-        
-        if target_id not in table_ids:
-            return f"Error: Table '{target_id}' not found. Found these: {table_ids}"
-
+        # Add a row to the 'Analyzer' Action Table
         response = jamai.table.add_table_rows(
             table_type=t.TableType.ACTION,
-            request=t.RowAddRequest(
-                table_id=target_id,
+            request=t.MultiRowAddRequest(
+                table_id="Analyzer",
                 data=[{"tnc_text": tnc_text}],
                 stream=False
             )
@@ -102,4 +98,5 @@ def generate_pdf(results_dict):
         pdf.multi_cell(0, 10, clean_content)
         pdf.ln(10)
         
+    return bytes(pdf.output())
     return bytes(pdf.output())
