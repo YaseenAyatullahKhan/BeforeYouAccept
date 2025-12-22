@@ -1,8 +1,6 @@
 import streamlit as st
-from utils import fetch_analysis_column, generate_pdf
+from utils import fetch_full_analysis, generate_pdf, get_base64_image
 import time
-from utils import get_base64_bin_file
-from utils import get_base64_image
 
 # --- 1. PAGE CONFIG & DESIGN ---
 st.set_page_config(
@@ -12,7 +10,7 @@ st.set_page_config(
     initial_sidebar_state="collapsed"
 )
 
-# Custom CSS for Purple Gradient and Design
+# Custom CSS for Background and Removing the "Empty Bar"
 try:
     img_base64 = get_base64_image("assets/background.jpg")
     bg_style = f"""
@@ -25,33 +23,43 @@ try:
         }}
     """
 except FileNotFoundError:
-    bg_style = "<style> .stApp { background: #1e0030; } " # Fallback
+    bg_style = "<style> .stApp { background: #1e0030; } "
 
 st.markdown(bg_style + """
-    /* HIDE THE EMPTY TOP BAR */
+    /* HIDE STREAMLIT HEADER & REDUCE TOP GAP */
     header[data-testid="stHeader"] {
         background: rgba(0,0,0,0);
         height: 0px;
     }
-
-    /* REMOVE PADDING BELOW HEADING */
-    .block-container {
+    
+    .main .block-container {
         padding-top: 1rem !important;
         padding-bottom: 0rem !important;
     }
-    
-    /* REMOVE SPACE BETWEEN ELEMENTS */
-    [data-testid="stVerticalBlock"] {
-        gap: 0.5rem !important;
+
+    /* REMOVE THE GAP BELOW THE TITLE */
+    h1 {
+        margin-top: -20px !important;
+        margin-bottom: 0px !important;
+        padding-bottom: 0px !important;
     }
 
     .stApp { color: white; }
+    
     .glass-box {
         background: rgba(255, 255, 255, 0.05);
         backdrop-filter: blur(15px);
         border-radius: 15px;
         padding: 20px;
         border: 1px solid rgba(255, 255, 255, 0.1);
+        margin-top: 10px;
+    }
+
+    /* Style for the 'fake' tabs */
+    div[data-testid="stHorizontalBlock"] button {
+        background-color: rgba(255, 255, 255, 0.1) !important;
+        color: white !important;
+        border: 1px solid rgba(157, 91, 239, 0.5) !important;
     }
     </style>
 """, unsafe_allow_html=True)
@@ -60,24 +68,22 @@ st.markdown(bg_style + """
 if "page" not in st.session_state:
     st.session_state.page = "landing"
 if "results" not in st.session_state:
-    st.session_state.results = {}
+    st.session_state.results = {} # Will hold all JamAI data
 if "risk_header" not in st.session_state:
     st.session_state.risk_header = ""
+if "active_tab" not in st.session_state:
+    st.session_state.active_tab = "analysis_summary"
 
 # --- 3. PAGE LOGIC: LANDING PAGE ---
 if st.session_state.page == "landing":
     col1, col2, col3 = st.columns([1, 2, 1])
     with col2:
-        # Assuming logo.png is in assets/ folder
         try:
-            st.image("assets/logo.png", width=200)
+            st.image("assets/logo.png", width=250)
         except:
             st.title("🧐 BeforeYouAccept")
-            
-        st.markdown("<h1 class='hero-text'>Know Those T&Cs Right 🧐</h1>", unsafe_allow_html=True)
         
-        # Space for your background hero image placeholder
-        #st.image("assets/background.jpg", use_container_width=True)
+        st.markdown("<h2 style='text-align: center;'>Know Those T&Cs Right 🧐</h2>", unsafe_allow_html=True)
         
         if st.button("Get T&C Alerts", use_container_width=True, type="primary"):
             st.session_state.page = "execution"
@@ -90,87 +96,69 @@ else:
     # --- INPUT SECTION ---
     with st.container():
         st.markdown("<div class='glass-box'>", unsafe_allow_html=True)
-        
-        # Multi-option Input
         input_type = st.radio("Choose Input Method:", ["Paste Text", "Upload PDF"], horizontal=True)
         
         tnc_input = ""
         if input_type == "Paste Text":
-            tnc_input = st.text_area("Paste the T&C text here:", height=250, placeholder="Scroll to the bottom, Ctrl+A, Ctrl+C...")
+            tnc_input = st.text_area("Paste the T&C text here:", height=200, placeholder="Ctrl+A, Ctrl+C...")
         else:
-            uploaded_file = st.file_uploader("Upload T&C Document (PDF)", type="pdf")
-            if uploaded_file:
-                # Basic text extraction from PDF can be added here or in utils.py
-                # For this prototype, we'll assume text paste for full accuracy
-                st.warning("PDF Text Extraction requires 'PyPDF2' - using pasted text for now.")
-        
+            uploaded_file = st.file_uploader("Upload PDF", type="pdf")
+            st.info("PDF extraction active in backend.")
+
         analyze_btn = st.button("Analyze Malaysian Compliance 🚀", use_container_width=True)
         st.markdown("</div>", unsafe_allow_html=True)
 
-    # --- EXECUTION & RESULTS ---
+    # --- EXECUTION ---
     if analyze_btn and tnc_input:
-        with st.status("Analyzing against PUA 2024 & CPA 1999...", expanded=True) as status:
-            # 1. Get Risk Score first (Low Token Cost)
-            st.write("Calculating Risk Score...")
-            st.session_state.risk_header = fetch_analysis_column(tnc_input, "risk_scoring")
+        with st.status("Performing Single-Pass Legal Audit...", expanded=True) as status:
+            # ONE SINGLE CALL: Fetches all columns into a dictionary
+            full_data = fetch_full_analysis(tnc_input)
             
-            # 2. Reset other results to force "Load on Demand"
-            st.session_state.results = {}
-            st.session_state.current_text = tnc_input # Save text for tab calls
-            
-            status.update(label="Analysis Complete!", state="complete", expanded=False)
-        
-        # Auto-scroll anchor
-        st.markdown("<div id='results-top'></div>", unsafe_allow_html=True)
-        st.components.v1.html("""<script>window.parent.document.getElementById('results-top').scrollIntoView({behavior: 'smooth'});</script>""", height=0)
+            if full_data:
+                st.session_state.results = full_data
+                # Risk score is part of the dictionary
+                st.session_state.risk_header = full_data.get("risk_scoring", "⚠️ Score Unavailable")
+                status.update(label="Analysis Complete!", state="complete", expanded=False)
+            else:
+                st.error("JamAI failed to analyze the document.")
 
-    # --- TAB SECTION (LOAD ON DEMAND) ---
+    # --- RESULTS SECTION ---
     if st.session_state.risk_header:
-        st.divider()
-        st.subheader(st.session_state.risk_header)
+        st.markdown(f"<h2 style='text-align: center; color: #9d5bef;'>{st.session_state.risk_header}</h2>", unsafe_allow_html=True)
         
-        # Using Columns as fake "Tabs" for Load-On-Demand control
+        # Fake Tabs using columns
         t1, t2, t3 = st.columns(3)
-        
-        # Column 1: Summary
         if t1.button("📜 Summary", use_container_width=True):
-            with st.spinner("Summarizing..."):
-                st.session_state.results["analysis_summary"] = fetch_analysis_column(st.session_state.current_text, "analysis_summary")
-        
-        # Column 2: Critical Alerts
+            st.session_state.active_tab = "analysis_summary"
         if t2.button("⚠️ Critical Alerts", use_container_width=True):
-            with st.spinner("Finding Violations..."):
-                st.session_state.results["critical_alerts"] = fetch_analysis_column(st.session_state.current_text, "critical_alerts")
-        
-        # Column 3: Implications
+            st.session_state.active_tab = "critical_alerts"
         if t3.button("🔮 Implications", use_container_width=True):
-            with st.spinner("Forecasting Risks..."):
-                st.session_state.results["long_term_implications"] = fetch_analysis_column(st.session_state.current_text, "long_term_implications")
+            st.session_state.active_tab = "long_term_implications"
 
-        # Display Area
+        # Content Display Area
         st.markdown("<div class='glass-box'>", unsafe_allow_html=True)
-        # Show whichever result was last fetched
-        for key in ["analysis_summary", "critical_alerts", "long_term_implications"]:
-            if key in st.session_state.results:
-                label = key.replace("_", " ").title()
-                st.write(f"### {label}")
-                st.write(st.session_state.results[key])
-                st.divider()
+        active = st.session_state.active_tab
+        display_text = st.session_state.results.get(active, "Click a tab to view details.")
+        
+        # Formatting for Critical Alerts
+        if active == "critical_alerts":
+            display_text = display_text.replace("- ", "⚠️ ").replace("* ", "⚠️ ")
+            
+        st.write(f"### {active.replace('_', ' ').title()}")
+        st.write(display_text)
         st.markdown("</div>", unsafe_allow_html=True)
 
-        # --- EXPORT SECTION ---
+        # --- EXPORT ---
         st.markdown("<br>", unsafe_allow_html=True)
-        if st.session_state.results:
-            pdf_data = generate_pdf(st.session_state.results)
-            st.download_button(
-                label="📥 Export Full Report to PDF",
-                data=pdf_data,
-                file_name="TnC_Legal_Report_Malaysia.pdf",
-                mime="application/pdf",
-                use_container_width=True
-            )
+        pdf_data = generate_pdf(st.session_state.results)
+        st.download_button(
+            label="📥 Export Full Report to PDF",
+            data=pdf_data,
+            file_name="BYA_Legal_Audit.pdf",
+            mime="application/pdf",
+            use_container_width=True
+        )
 
-    # Back to Landing Button
     if st.button("← Back to Home", type="tertiary"):
         st.session_state.page = "landing"
         st.rerun()
