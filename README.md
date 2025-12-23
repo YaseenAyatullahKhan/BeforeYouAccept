@@ -9,10 +9,10 @@ BeforeYouAccept/
 ├── src/
 │   ├── app.py              # MAIN CODE (The heart of the project)
 │   ├── utils.py            # Helper functions (API calls & PDF logic)
-│   └── requirements.txt    # List: streamlit, jamai-base, fpdf
+│   └── requirements.txt    # streamlit, jamaibase, fpdf, pycountry, fastapi
 ├── assets/
 │   ├── logo.png
-│   └── background.jpg      #hero page image
+│   └── background.jpg
 ├── .gitignore
 └── README.md
 ```
