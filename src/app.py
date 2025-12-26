@@ -198,7 +198,7 @@ else:
             st.session_state.active_tab = "analysis_summary"
         if t2.button("⚠️ Critical Alerts", use_container_width=True):
             st.session_state.active_tab = "critical_alerts"
-        if t3.button("🔮 Implications", use_container_width=True):
+        if t3.button("⏳ Implications", use_container_width=True):
             st.session_state.active_tab = "long_term_implications"
 
         # Content Display Area
